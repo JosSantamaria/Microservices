@@ -1,4 +1,5 @@
 using AutoMapper;
+using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Servicios.api.Seguridad.Core.Application;
 using Servicios.api.Seguridad.Core.Entities;
+using Servicios.api.Seguridad.Core.JwtLogic;
 using Servicios.api.Seguridad.Core.Persistence;
 using System;
 using System.Collections.Generic;
@@ -33,26 +35,31 @@ namespace Servicios.api.Seguridad
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //Validacion con Fluent Validation
+            services.AddControllers().AddFluentValidation(x => x.RegisterValidatorsFromAssemblyContaining<Register>());
+
             services.AddDbContext<SeguridadContexto>(opt =>
             {
                 opt.UseSqlServer(Configuration.GetConnectionString("ConexionDb"));
             });
 
+            //Constructor
             var builder = services.AddIdentityCore<Usuario>(); //Metodo para creacion de Objetos
-            
+            //Consrictor
             var identityBuilder = new IdentityBuilder(builder.UserType, builder.Services);
-            
+            //Constructor de la cadena de conexion de la DB
             identityBuilder.AddEntityFrameworkStores<SeguridadContexto>();
-
+            //Constructor Agregado de la clase para el inicio de sesion y creacion del primer usuario
             identityBuilder.AddSignInManager<SignInManager<Usuario>>(); //Inicio de Sesion
 
             services.TryAddSingleton<ISystemClock, SystemClock>();
-
+            //devuelde el tipo de objeto ensamblado
             services.AddMediatR(typeof(Register.UsuarioRegisterCommand).Assembly);
 
             services.AddAutoMapper(typeof(Register.UsuarioRegisterHandler));
+            //Constructor de implementacion del JWT
+            services.AddScoped<IJwtGenerator, JwtGenerator>();
 
-            services.AddControllers();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
