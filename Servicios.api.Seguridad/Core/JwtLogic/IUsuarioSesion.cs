@@ -5,8 +5,9 @@ using System.Threading.Tasks;
 
 namespace Servicios.api.Seguridad.Core.JwtLogic
 {
-    interface IUsuarioSesion
+    public interface IUsuarioSesion
     {
         string GetUsuarioSesion();
     }
+
 }

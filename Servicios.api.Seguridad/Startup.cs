@@ -2,6 +2,7 @@ using AutoMapper;
 using FluentValidation.AspNetCore;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -12,6 +13,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using Servicios.api.Seguridad.Core.Application;
 using Servicios.api.Seguridad.Core.Entities;
 using Servicios.api.Seguridad.Core.JwtLogic;
@@ -19,6 +21,7 @@ using Servicios.api.Seguridad.Core.Persistence;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Servicios.api.Seguridad
@@ -59,6 +62,22 @@ namespace Servicios.api.Seguridad
             services.AddAutoMapper(typeof(Register.UsuarioRegisterHandler));
             //Constructor de implementacion del JWT
             services.AddScoped<IJwtGenerator, JwtGenerator>();
+            //Obtenemos la sesion actual.
+            services.AddScoped<IUsuarioSesion, UsuarioSesion>();
+
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("Jsantamaria2022$asdfghjklñ"));
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(opt =>
+            {
+                opt.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = key,
+                    ValidateAudience = false,
+                    ValidateIssuer = false  //Verifica el dominio
+                };
+            });
+
+
 
         }
 
@@ -73,6 +92,8 @@ namespace Servicios.api.Seguridad
             app.UseRouting();
 
             app.UseAuthorization();
+            
+            app.UseAuthentication(); //Se implementa para poder obtener la sesion por medio del token y no de error de userName.
 
             app.UseEndpoints(endpoints =>
             {

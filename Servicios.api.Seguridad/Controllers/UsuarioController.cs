@@ -32,5 +32,11 @@ namespace Servicios.api.Seguridad.Controllers
         {
             return await _mediator.Send(parametros);
         }
+
+        [HttpGet]
+        public async Task<ActionResult<UsuarioDto>> Get()
+        {
+            return await _mediator.Send(new UsuarioActual.UsuarioActualCommand());
+        }
     }
 }
