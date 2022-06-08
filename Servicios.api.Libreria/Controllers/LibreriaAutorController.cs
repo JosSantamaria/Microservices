@@ -21,7 +21,6 @@ namespace Servicios.api.Libreria.Controllers
         }
 
         /// Metodos
-        /// 
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AutorEntity>>> Get()
         {

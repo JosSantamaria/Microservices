@@ -75,6 +75,7 @@ namespace Servicios.api.Libreria
 
             app.UseRouting();
 
+            //Recomendacion poner debajo del Routing
             app.UseCors("CorsRule"); //Añadimos el uso del CORS que creamos
 
             app.UseAuthorization();

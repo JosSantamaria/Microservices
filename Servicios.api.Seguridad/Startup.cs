@@ -77,7 +77,14 @@ namespace Servicios.api.Seguridad
                 };
             });
 
+            //Añadimos nuestro CORS - politica de acceso
+            services.AddCors(opt => {
 
+                opt.AddPolicy("CorsRule", rule =>
+                {
+                    rule.AllowAnyHeader().AllowAnyMethod().WithOrigins("*"); //Acceso permitido desde cualquier cliente / puerto
+                });
+            });
 
         }
 
@@ -90,6 +97,9 @@ namespace Servicios.api.Seguridad
             }
 
             app.UseRouting();
+
+            //Recomendacion poner debajo del Routing
+            app.UseCors("CorsRule"); //Añadimos el uso del CORS que creamos
 
             app.UseAuthorization();
             
